@@ -180,6 +180,7 @@ public class Main extends JavaPlugin implements Listener {
 					Location artifact = new Location(player.getWorld(), thievesX, thievesY, thievesZ);
 					Block artifactBlock = player.getWorld().getBlockAt(artifact);
 					artifactBlock.setType(Material.DRAGON_EGG);
+					return true;
 				}
 			}
 		}
