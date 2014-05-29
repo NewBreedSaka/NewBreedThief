@@ -1,0 +1,14 @@
+name: NewBreedThief
+author: Saka
+version: 1.0
+main: com.newbreedgaming.newbreedthief.Main
+depend: [EffectLib]
+commands:
+    setthievesspawn:
+        description: Sets the thieves spawn
+    setguardsspawn:
+        description: Sets the guards spawn
+    addartifact:
+        description: Add a new location for artifacts to spawn
+    spawnartifact:
+        description: spawn an artifact
