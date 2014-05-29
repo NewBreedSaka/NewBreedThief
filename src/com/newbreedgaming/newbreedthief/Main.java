@@ -302,10 +302,12 @@ public class Main extends JavaPlugin implements Listener {
 				Location location = player.getLocation();
 
 				if (checkCooldown(shadowMeldCooldown, player, 10, "shadowmeld") == true) {
-					if(Teams.isThief(player) == true) { // only give thieves invisibility
+					if(Teams.isThief(player) == true) { //only give thieves invisibility
 						//if player is in the dark hide them
 						if(player.getLocation().getBlock().getLightLevel() < 6) {
+							//remove potion to reset timer
 							player.removePotionEffect(PotionEffectType.INVISIBILITY);
+							//re-add potion effect to player
 							player.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,400,0));
 							location.getWorld().playEffect(location, Effect.SMOKE, 1);
 							player.sendMessage(ChatColor.GOLD + "You have shadowmelded!");
