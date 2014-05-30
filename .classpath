@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/dannydjones1994/Downloads/craftbukkit-1.7.9-R0.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dannydjones1994/Downloads/EffectLib.jar"/>
+	<classpathentry kind="lib" path="C:/Users/lc3gf_000/Documents/GitHub/NewBreedThief/bin/EffectLib.jar"/>
+	<classpathentry kind="lib" path="C:/Users/lc3gf_000/Documents/GitHub/NewBreedThief/bin/craftbukkit-1.7.9-R0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
