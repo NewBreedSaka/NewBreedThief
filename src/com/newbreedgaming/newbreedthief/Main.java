@@ -33,6 +33,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -129,6 +130,12 @@ public class Main extends JavaPlugin implements Listener {
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			//add player to team with less players
+			
+
+			if(p.getInventory().contains(Material.NETHER_STAR)){
+				p.getInventory().remove(Material.NETHER_STAR);
+			}
+		
 			if(Teams.getGuards().size() < Teams.getThieves().size()) {
 				Teams.addToTeam(TeamType.GUARD, p, thiefTeam, guardTeam);
 			} else {
@@ -153,6 +160,13 @@ public class Main extends JavaPlugin implements Listener {
 		effectManager.dispose();
 		HandlerList.unregisterAll((Listener) this);
 		saveConfig();
+		for(Player player : Bukkit.getOnlinePlayers()){
+
+			if(player.getInventory().contains(Material.NETHER_STAR)){
+				player.getInventory().remove(Material.NETHER_STAR);
+			}
+		
+		}
 	}
 
 	@EventHandler
@@ -764,6 +778,17 @@ public class Main extends JavaPlugin implements Listener {
 
 
 
+	}
+	
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e ){
+		Player player = (Player) e.getPlayer();
+		
+			if(player.getInventory().contains(Material.NETHER_STAR)){
+				player.getInventory().remove(Material.NETHER_STAR);
+			}
+		
 	}
 
 }
