@@ -28,6 +28,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -60,10 +61,48 @@ public class Main extends JavaPlugin implements Listener {
 	public HashMap<String, Long> fireOfRevealing = new HashMap<String, Long>();
 	public HashMap<String, Long> shadowMeldCooldown = new HashMap<String, Long>();
 
+	ArrayList<Player> thiefplayers;
+	ArrayList<Player> guardplayers;
+
+	ArrayList<Player> standardthiefitems;
+	ArrayList<Player> smokeitems;
+	ArrayList<Player> blinkitems;
+
+
+	ArrayList<Player> standardguarditems;
+	ArrayList<Player> scoutitems;
+	ArrayList<Player> heavyitems;
+	ArrayList<Player> mageitems;
+
+
+
+	ItemStack kitselector;
+
+	Inventory inv;
+	Inventory inv1;
+	ItemStack standard, scout, heavy, mage;
+	ItemStack standard1, smoke, blink;
 
 	Logger logger = Logger.getLogger("Minecraft");
 
 	public void onEnable() {
+		standardthiefitems = new ArrayList<Player>();
+		smokeitems = new ArrayList<Player>();
+		blinkitems = new ArrayList<Player>();
+		getConfig().options().copyDefaults(true);
+
+		scoutitems = new ArrayList<Player>();
+		heavyitems = new ArrayList<Player>();
+		mageitems = new ArrayList<Player>();
+		standardguarditems = new ArrayList<Player>();
+
+		kitselector = new ItemStack(Material.NETHER_STAR);
+		ItemMeta im = kitselector.getItemMeta();
+		im.setDisplayName("Kit Selector");
+		im.setLore(Arrays.asList("Choose your kit!"));
+		kitselector.setItemMeta(im);
+		thiefplayers = new ArrayList<Player>();
+		guardplayers = new ArrayList<Player>();
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		this.getConfig().options().copyDefaults(true);
 		EffectLib lib = EffectLib.instance();
@@ -126,8 +165,13 @@ public class Main extends JavaPlugin implements Listener {
 		//add player to team with less players
 		if(Teams.getGuards().size() < Teams.getThieves().size()) {
 			Teams.addToTeam(TeamType.GUARD, player, thiefTeam, guardTeam);
+			guardplayers.add(player);
+			player.getInventory().addItem(kitselector);
+
 		} else {
 			Teams.addToTeam(TeamType.THIEF, player, thiefTeam, guardTeam);
+			player.getInventory().addItem(kitselector);
+			thiefplayers.add(player);
 		}
 
 		// If enough players joined start game
@@ -256,8 +300,105 @@ public class Main extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
+
+
+
+
+
+		inv = Bukkit.createInventory(null, 9, "Pick Your Guard Class"); 
+
+		standard = new ItemStack(Material.LEATHER_CHESTPLATE);
+		ItemMeta im = standard.getItemMeta();
+		im.setLore(Arrays.asList(ChatColor.DARK_PURPLE + " Normal armour, no access to walkways ability grants strength"));
+		im.setDisplayName(ChatColor.AQUA + "StandardGuard");
+		standard.setItemMeta(im);		
+
+
+		scout = new ItemStack(Material.POTION);
+		ItemMeta im1 = scout.getItemMeta();
+		im1.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Use Thief pathways, and has dash ability"));
+		im1.setDisplayName(ChatColor.AQUA + "Scout");
+		scout.setItemMeta(im1);	
+
+		heavy = new ItemStack(Material.BREAD);
+		ItemMeta im2 = heavy.getItemMeta();
+		im2.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Increase Health"));
+		im2.setDisplayName(ChatColor.AQUA + "Heavy");
+		heavy.setItemMeta(im2);	
+
+		mage = new ItemStack(Material.FIRE);
+		ItemMeta im3 = mage.getItemMeta();
+		im3.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Use the fire of revealing spell to un-shadowmeld thieves"));
+		im3.setDisplayName(ChatColor.AQUA + "Mage");
+		mage.setItemMeta(im3);	
+
+
+		inv.addItem(new ItemStack(standard));
+		inv.addItem(new ItemStack(scout));
+		inv.addItem(new ItemStack(heavy));
+		inv.addItem(new ItemStack(mage));
+
+		inv1 = Bukkit.createInventory(null, 9, "Pick Your Thief Class"); 
+
+		standard1 = new ItemStack(Material.FEATHER);
+		ItemMeta im4 = standard1.getItemMeta();
+		im4.setDisplayName(ChatColor.AQUA + "StandardThief");
+		im4.setLore(Arrays.asList(ChatColor.DARK_PURPLE + " Backstabs Guards "));
+		standard1.setItemMeta(im4);		
+
+
+		smoke = new ItemStack(Material.EGG);
+		ItemMeta im12 = smoke.getItemMeta();
+		im12.setDisplayName(ChatColor.AQUA + "Smoke");
+		im12.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Access to smoke eggs which blind guards to make killing easier"));
+		smoke.setItemMeta(im12);	
+
+		blink = new ItemStack(Material.COMPASS);
+		ItemMeta im23 = blink.getItemMeta();
+		im23.setDisplayName(ChatColor.AQUA + "Blink");
+		im23.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "May jump several blocks towards the nearest guard it a teleportation style "));
+		blink.setItemMeta(im23);	
+
+
+
+
+		inv1.addItem(new ItemStack(standard1));
+		inv1.addItem(new ItemStack(smoke));
+		inv1.addItem(new ItemStack(blink));
+
+
+
+
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
+
+
+		ItemStack i = player.getItemInHand();
+		ItemMeta meta = i.getItemMeta();
+		String name = meta.getDisplayName();
+		if (name != null && name.equalsIgnoreCase("Kit Selector")) {
+			if(i.getType().equals(Material.NETHER_STAR)){
+
+
+				if(thiefplayers.contains(player)){
+
+					player.openInventory(inv1);
+
+
+				}
+
+				if(guardplayers.contains(player)){
+					player.openInventory(inv);
+
+
+
+				}
+
+
+			}
+		}
+
+
 		if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			if (event.getClickedBlock().getType() == Material.DRAGON_EGG) {
 				event.setCancelled(true);
@@ -426,6 +567,7 @@ public class Main extends JavaPlugin implements Listener {
 						countdowntimer--;
 					} else {
 						Bukkit.broadcastMessage(ChatColor.GOLD + "Let the game begin!");
+					
 
 
 						int thievesX = getConfig().getInt("Thieves.x");
@@ -441,13 +583,22 @@ public class Main extends JavaPlugin implements Listener {
 							Player player = Bukkit.getServer().getPlayer(thieves);
 							player.sendMessage(ChatColor.GOLD + "Teleported to theives base");
 							player.teleport(new Location(player.getWorld(), thievesX, thievesY, thievesZ));
+							giveKits(player);
+							if(player.getInventory().contains(Material.NETHER_STAR)){
+								player.getInventory().remove(Material.NETHER_STAR);
+							}
 						}
 
 						// move all guards to their base
 						for(String guards : Teams.getGuards()) {
 							Player player = Bukkit.getServer().getPlayer(guards);
 							Bukkit.getServer().getPlayer(guards).sendMessage(ChatColor.GOLD + "Teleported to guards base");
+							giveKits(player);
+
 							player.teleport(new Location(player.getWorld(), guardsX, guardsY, guardsZ));
+							if(player.getInventory().contains(Material.NETHER_STAR)){
+								player.getInventory().remove(Material.NETHER_STAR);
+							}
 						}
 						gameBegun = true;
 						countdowntimer--; // set count down timer to -1 so the scheduler does not run any further.
@@ -458,4 +609,161 @@ public class Main extends JavaPlugin implements Listener {
 		}, 200L, 20L);
 
 	}
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent e) {
+		Player p = (Player) e.getWhoClicked();
+		if (e.getInventory().getTitle().equalsIgnoreCase("Pick Your Guard Class") || e.getInventory().getTitle().equalsIgnoreCase("Pick Your Thief Class")) {
+			if (e.getCurrentItem().getItemMeta() == null) return;
+			if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Mage")) {
+				e.setCancelled(true);
+				p.sendMessage(ChatColor.GREEN + "You selected Mage kit!");
+
+
+
+				e.getWhoClicked().closeInventory();
+				return;
+			}
+			if (e.getCurrentItem().getItemMeta().getDisplayName().contains("StandardGuard")) {
+				e.setCancelled(true);
+				p.sendMessage(ChatColor.GREEN + "You selected StandardGuard kit!");
+				standardguarditems.add(p);
+
+
+
+
+				e.getWhoClicked().closeInventory();
+				return;
+			}
+			if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Scout")) {
+				e.setCancelled(true);
+				p.sendMessage(ChatColor.GREEN + "You selected Scout kit!");
+				scoutitems.add(p);
+				e.getWhoClicked().closeInventory();
+				return;
+			}
+			if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Heavy")) {
+				e.setCancelled(true);
+				p.sendMessage(ChatColor.GREEN + "You selected Heavy kit!");
+				heavyitems.add(p);
+
+
+				e.getWhoClicked().closeInventory();
+				return;
+			}
+
+
+
+
+
+
+
+
+
+
+
+
+			if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Smoke")) {
+				e.setCancelled(true);
+				p.sendMessage(ChatColor.GREEN + "You selected Smoke kit!");
+				smokeitems.add(p);
+
+
+
+				e.getWhoClicked().closeInventory();
+				return;
+			}
+			if (e.getCurrentItem().getItemMeta().getDisplayName().contains("StandardThief")) {
+				e.setCancelled(true);
+				p.sendMessage(ChatColor.GREEN + "You selected StandardThief kit!");
+				standardthiefitems.add(p);
+
+
+
+				e.getWhoClicked().closeInventory();
+				return;
+			}
+			if (e.getCurrentItem().getItemMeta().getDisplayName().contains("Blink")) {
+				e.setCancelled(true);
+				p.sendMessage(ChatColor.GREEN + "You selected Blink kit!");
+				blinkitems.add(p);
+
+				e.getWhoClicked().closeInventory();
+				return;
+			}
+
+		}
+	}
+
+	public void giveKits(Player plu){
+
+
+		if(standardthiefitems.contains(plu)){
+			ItemStack speeder = new ItemStack(Material.FEATHER);
+			ItemMeta speederim = speeder.getItemMeta();
+			speederim.setDisplayName(ChatColor.AQUA + "Speed Boost");
+			speederim.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Access to dash , speed boost, jump boost"));
+			speeder.setItemMeta(speederim); 
+			plu.getInventory().addItem(speeder);
+			plu.sendMessage(ChatColor.BLUE + "Kit recieved!");
+
+
+
+			return;
+
+		}
+
+		if(smokeitems.contains(plu)){
+
+			ItemStack smoker = new ItemStack(Material.EGG);
+			ItemMeta smokerim = smoker.getItemMeta();
+			smokerim.setDisplayName(ChatColor.AQUA + "Smoke Eggs");
+			smokerim.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Blind Guards!"));
+			smoker.setItemMeta(smokerim);
+			plu.getInventory().addItem(smoker);
+			plu.sendMessage(ChatColor.BLUE + "Kit recieved!");
+			return;
+		}
+
+		if(blinkitems.contains(plu)){
+
+			plu.sendMessage(ChatColor.RED + "Kit comming soon!");
+			return;
+		}
+
+		if(standardguarditems.contains(plu)){
+
+
+			plu.sendMessage(ChatColor.RED + "Kit comming soon!");
+			return;
+
+		}
+
+		if(scoutitems.contains(plu)){
+
+			plu.sendMessage(ChatColor.RED + "Kit comming soon!");
+			return;
+		}
+		if(heavyitems.contains(plu)){
+
+			plu.sendMessage(ChatColor.RED + "Kit comming soon!");
+
+			return;
+		}
+		if(mageitems.contains(plu)){
+			plu.sendMessage(ChatColor.RED + "Kit comming soon!");
+
+			return;
+
+		}
+		
+		
+		plu.sendMessage(ChatColor.RED + "No kit selected, applying default.");
+		
+			
+		
+
+
+
+	}
+
 }
