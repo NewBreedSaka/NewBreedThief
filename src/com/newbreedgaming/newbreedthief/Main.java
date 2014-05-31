@@ -65,23 +65,7 @@ public class Main extends JavaPlugin implements Listener {
 
 	public HashMap<String, String> selectedKit = new HashMap<String, String>();
 	
-	
-	//ArrayList<Player> thiefplayers;
-	//ArrayList<Player> guardplayers;
-
-	//ArrayList<Player> standardthiefitems;
-	//ArrayList<Player> smokeitems;
-	//ArrayList<Player> blinkitems;
-
-
-	//ArrayList<Player> standardguarditems;
-	//ArrayList<Player> scoutitems;
-	//ArrayList<Player> heavyitems;
-	//ArrayList<Player> mageitems;
-
-
-
-	ItemStack kitselector;
+	ItemStack kitSelector;
 
 	Inventory guardInv;
 	Inventory thiefInv;
@@ -93,11 +77,11 @@ public class Main extends JavaPlugin implements Listener {
 	public void onEnable() {
 		getConfig().options().copyDefaults(true);
 
-		kitselector = new ItemStack(Material.NETHER_STAR);
-		ItemMeta im = kitselector.getItemMeta();
+		kitSelector = new ItemStack(Material.NETHER_STAR);
+		ItemMeta im = kitSelector.getItemMeta();
 		im.setDisplayName("Kit Selector");
 		im.setLore(Arrays.asList("Choose your kit!"));
-		kitselector.setItemMeta(im);
+		kitSelector.setItemMeta(im);
 		
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		this.getConfig().options().copyDefaults(true);
@@ -127,8 +111,8 @@ public class Main extends JavaPlugin implements Listener {
 			//add player to team with less players
 			
 
-			if(p.getInventory().contains(Material.NETHER_STAR)){
-				p.getInventory().remove(Material.NETHER_STAR);
+			if(p.getInventory().contains(Material.NETHER_STAR) == false){
+				p.getInventory().addItem(kitSelector);
 			}
 		
 			if(Teams.getGuards().size() < Teams.getThieves().size()) {
@@ -156,11 +140,7 @@ public class Main extends JavaPlugin implements Listener {
 		HandlerList.unregisterAll((Listener) this);
 		saveConfig();
 		for(Player player : Bukkit.getOnlinePlayers()){
-
-			if(player.getInventory().contains(Material.NETHER_STAR)){
-				player.getInventory().remove(Material.NETHER_STAR);
-			}
-		
+			player.getInventory().remove(Material.NETHER_STAR);
 		}
 	}
 
@@ -174,18 +154,27 @@ public class Main extends JavaPlugin implements Listener {
 		//add player to team with less players
 		if(Teams.getGuards().size() < Teams.getThieves().size()) {
 			Teams.addToTeam(TeamType.GUARD, player, thiefTeam, guardTeam);
-			player.getInventory().addItem(kitselector);
-
 		} else {
 			Teams.addToTeam(TeamType.THIEF, player, thiefTeam, guardTeam);
-			player.getInventory().addItem(kitselector);
 		}
 
+		//Add nether star to players inventory if they do now have one
+		if(player.getInventory().contains(Material.NETHER_STAR) == false){
+			player.getInventory().addItem(kitSelector);
+		}
+		
 		// If enough players joined start game
 		if(Bukkit.getOnlinePlayers().length >= Integer.parseInt(getConfig().getString("Playerstostart"))) {
 			startGame();
 		}
 
+	}
+	
+	@EventHandler
+	public void onQuit(PlayerQuitEvent e ){
+		Player player = (Player) e.getPlayer();
+		player.getInventory().remove(Material.NETHER_STAR);
+		
 	}
 
 	@Override
@@ -194,6 +183,7 @@ public class Main extends JavaPlugin implements Listener {
 			Player player = (Player) sender;
 			if (player.isOp() == true) {
 				if (commandLabel.equalsIgnoreCase("setthievesspawn")) {
+					
 					getConfig().set("Thieves.x",
 							player.getLocation().getBlockX());
 					getConfig().set("Thieves.y",
@@ -202,8 +192,11 @@ public class Main extends JavaPlugin implements Listener {
 							player.getLocation().getBlockZ());
 					saveConfig();
 					player.sendMessage(ChatColor.GOLD + "Thieves spawn set");
+					
 					return true;
+					
 				} else if (commandLabel.equalsIgnoreCase("setguardsspawn")) {
+					
 					getConfig().set("Guards.x",
 							player.getLocation().getBlockX());
 					getConfig().set("Guards.y",
@@ -211,9 +204,12 @@ public class Main extends JavaPlugin implements Listener {
 					getConfig().set("Guards.z",
 							player.getLocation().getBlockZ());
 					saveConfig();
-					player.sendMessage(ChatColor.GOLD + "Gaurds spawn set");
+					player.sendMessage(ChatColor.GOLD + "Guards spawn set");
+					
 					return true;
+					
 				} else if (commandLabel.equalsIgnoreCase("addartifact")) {
+					
 					int newArtifact = getConfig().getInt("NewestArtifact") + 1;
 					getConfig().set("Artifact." + newArtifact + ".x",
 							player.getLocation().getBlockX());
@@ -224,14 +220,20 @@ public class Main extends JavaPlugin implements Listener {
 					getConfig().set("NewestArtifact", newArtifact++);
 					saveConfig();
 					player.sendMessage("Added artifact spawn point at feet");
+
+					return true;
+					
 				} else if (commandLabel.equalsIgnoreCase("spawnartifact")) {
+					
 					int thievesX = getConfig().getInt("Artifact.1.x");
 					int thievesY = getConfig().getInt("Artifact.1.y");
 					int thievesZ = getConfig().getInt("Artifact.1.z");
 					Location artifact = new Location(player.getWorld(), thievesX, thievesY, thievesZ);
 					Block artifactBlock = player.getWorld().getBlockAt(artifact);
 					artifactBlock.setType(Material.DRAGON_EGG);
+					
 					return true;
+					
 				}
 			}
 		}
@@ -381,7 +383,6 @@ public class Main extends JavaPlugin implements Listener {
 		String name = meta.getDisplayName();
 		if (name != null && name.equalsIgnoreCase("Kit Selector")) {
 			if(i.getType().equals(Material.NETHER_STAR)){
-
 
 				if(Teams.isThief(player) == true){
 					player.openInventory(thiefInv);
@@ -535,6 +536,18 @@ public class Main extends JavaPlugin implements Listener {
 		item.setItemMeta(itemMeta);
 		return(item);
 	}
+	
+	public ItemStack createThiefDagger(String action) {
+		ItemStack item = new ItemStack(Material.FEATHER);
+		ItemMeta itemMeta = item.getItemMeta();
+		itemMeta.setDisplayName("§5Thieves dagger");
+		ArrayList<String> itemLore = new ArrayList<String>();
+		itemLore.add("§7Left click to stab");
+		itemLore.add("§7Right click to activate " + action + "!");
+		itemMeta.setLore(itemLore);
+		item.setItemMeta(itemMeta);
+		return(item);
+	}
 
 	public boolean checkCooldown(HashMap<String, Long> cooldowns, Player player, int cooldownTime, String action) {
 		if(cooldowns.containsKey(player.getName())) {
@@ -597,9 +610,7 @@ public class Main extends JavaPlugin implements Listener {
 							if(player.getInventory().contains(Material.NETHER_STAR)){
 								player.getInventory().remove(Material.NETHER_STAR);
 							}
-							if (selectedKit.containsKey(player) == false){
-								selectedKit.put(player.getName(), "Default");
-							}
+							
 						}
 						gameBegun = true;
 						countdowntimer--; // set count down timer to -1 so the scheduler does not run any further.
@@ -620,43 +631,43 @@ public class Main extends JavaPlugin implements Listener {
 			//Guards
 			if (iName.contains("Standard Guard")) {
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected Standard Guard kit!");
+				p.sendMessage(ChatColor.GREEN + "You selected the Standard Guard kit!");
 				selectedKit.put(p.getName(), "Default");
 				p.closeInventory();
 				return;
 			} else if (iName.contains("Scout")) {
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected Scout kit!");
+				p.sendMessage(ChatColor.GREEN + "You selected the Scout kit!");
 				selectedKit.put(p.getName(), "Scout");
 				p.closeInventory();
 				return;
 			} else if (iName.contains("Heavy")) {
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected Heavy kit!");
+				p.sendMessage(ChatColor.GREEN + "You selected the Heavy kit!");
 				selectedKit.put(p.getName(), "Heavy");
 				p.closeInventory();
 				return;
 			} else if (iName.contains("Mage")) {
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected Mage kit!");
+				p.sendMessage(ChatColor.GREEN + "You selected the Mage kit!");
 				p.closeInventory();
 				selectedKit.put(p.getName(), "Mage");
 				return;
 			} else if (iName.contains("Smoke")) { //Thieves
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected Smoke kit!");
+				p.sendMessage(ChatColor.GREEN + "You selected the Smoke kit!");
 				selectedKit.put(p.getName(), "Smoke");
 				p.closeInventory();
 				return;
 			} else if (iName.contains("StandardThief")) {
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected StandardThief kit!");
+				p.sendMessage(ChatColor.GREEN + "You selected the Standard Thief kit!");
 				selectedKit.put(p.getName(), "Default");
 				p.closeInventory();
 				return;
 			} else if (iName.contains("Blink")) {
 				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected Blink kit!");
+				p.sendMessage(ChatColor.GREEN + "You selected the Blink kit!");
 				selectedKit.put(p.getName(), "Blink");
 				p.closeInventory();
 				return;
@@ -666,67 +677,56 @@ public class Main extends JavaPlugin implements Listener {
 	}
 
 	public void giveKits(Player p){
-		
 
-		if(selectedKit.get(p) == "Scout"){
-			ItemStack speeder = new ItemStack(Material.FEATHER);
-			ItemMeta speederim = speeder.getItemMeta();
-			speederim.setDisplayName(ChatColor.AQUA + "Speed Boost");
-			speederim.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Access to dash , speed boost, jump boost"));
-			speeder.setItemMeta(speederim); 
-			p.getInventory().addItem(speeder);
+		if(selectedKit.get(p.getName()) == "Scout"){
+			p.getInventory().addItem(createThiefDagger("speed boost"));
 			p.sendMessage(ChatColor.BLUE + "Kit recieved!");
 
 			return;
 
-		} else if(selectedKit.get(p) == "Smoke"){
-
-			ItemStack smoker = new ItemStack(Material.EGG);
-			ItemMeta smokerim = smoker.getItemMeta();
-			smokerim.setDisplayName(ChatColor.AQUA + "Smoke Eggs");
-			smokerim.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Blind Guards!"));
-			smoker.setItemMeta(smokerim);
-			p.getInventory().addItem(smoker);
+		} else if(selectedKit.get(p.getName()) == "Smoke"){
+			p.getInventory().addItem(createEgg(16));
 			p.sendMessage(ChatColor.BLUE + "Kit recieved!");
 			
 			return;
 			
-		} else if(selectedKit.get(p) == "Blink"){
+		} else if(selectedKit.get(p.getName()) == "Blink"){
 
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
 			
 			return;
 			
-		} else if(selectedKit.get(p) == "Scout"){
+		} else if(selectedKit.get(p.getName()) == "Scout"){
 
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
+			
 			return;
-		} else if(selectedKit.get(p) == "Heavy"){
+			
+		} else if(selectedKit.get(p.getName()) == "Heavy"){
 
-			p.sendMessage(ChatColor.RED + "Kit comming soon!");
-
-			return;
-		} else if(selectedKit.get(p) == "Mage"){
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
 
 			return;
+			
+		} else if(selectedKit.get(p.getName()) == "Mage"){
+			
+			p.sendMessage(ChatColor.RED + "Kit comming soon!");
 
-		} else if (selectedKit.get(p) == "Default") {
+			return;
+
+		} else {
+			
+			if (Teams.isThief(p) == true) {
+				p.getInventory().addItem(createThiefDagger("special ability"));
+			}
 			p.sendMessage(ChatColor.RED + "No kit selected, applying default.");
+			
 			return;
+			
 		}
 		
 	}
 	
 	
-	@EventHandler
-	public void onQuit(PlayerQuitEvent e ){
-		Player player = (Player) e.getPlayer();
-		
-			if(player.getInventory().contains(Material.NETHER_STAR)){
-				player.getInventory().remove(Material.NETHER_STAR);
-			}
-		
-	}
 
 }

@@ -29,7 +29,7 @@ public class Teams {
 			  guardTeam.addPlayer(Bukkit.getOfflinePlayer(player.getName()));
 			  break;
 		  }
-		  player.sendMessage(ChatColor.GOLD + "Added to " + type.name()+ " team!");
+		  player.sendMessage(ChatColor.GOLD + "Added to " + type.name().toLowerCase() + " team!");
 	  }
 	  
 	  public static boolean isInTeam(Player player) {
