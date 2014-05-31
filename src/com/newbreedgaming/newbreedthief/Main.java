@@ -141,7 +141,7 @@ public class Main extends JavaPlugin implements Listener {
 		HandlerList.unregisterAll((Listener) this);
 		saveConfig();
 		for(Player player : Bukkit.getOnlinePlayers()){
-			player.getInventory().remove(Material.NETHER_STAR);
+			player.getInventory().clear();
 		}
 	}
 
@@ -183,7 +183,14 @@ public class Main extends JavaPlugin implements Listener {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 			if (player.isOp() == true) {
-				if (commandLabel.equalsIgnoreCase("setthievesspawn")) {
+				if(commandLabel.equalsIgnoreCase("thief")){
+					if(args.length == 0){
+						
+						player.sendMessage(ChatColor.RED + "Specifiy another command!");
+						return true;
+					}
+				
+				if (args[0].equalsIgnoreCase("setthievesspawn")) {
 					
 					getConfig().set("Thieves.x",
 							player.getLocation().getBlockX());
@@ -196,7 +203,7 @@ public class Main extends JavaPlugin implements Listener {
 					
 					return true;
 					
-				} else if (commandLabel.equalsIgnoreCase("setguardsspawn")) {
+				} else if (args[0].equalsIgnoreCase("setguardsspawn")) {
 					
 					getConfig().set("Guards.x",
 							player.getLocation().getBlockX());
@@ -209,7 +216,7 @@ public class Main extends JavaPlugin implements Listener {
 					
 					return true;
 					
-				} else if (commandLabel.equalsIgnoreCase("addartifact")) {
+				} else if (args[0].equalsIgnoreCase("addartifact")) {
 					
 					int newArtifact = getConfig().getInt("NewestArtifact") + 1;
 					getConfig().set("Artifact." + newArtifact + ".x",
@@ -224,7 +231,7 @@ public class Main extends JavaPlugin implements Listener {
 
 					return true;
 					
-				} else if (commandLabel.equalsIgnoreCase("spawnartifact")) {
+				} else if (args[0].equalsIgnoreCase("spawnartifact")) {
 					
 					int thievesX = getConfig().getInt("Artifact.1.x");
 					int thievesY = getConfig().getInt("Artifact.1.y");
@@ -236,9 +243,17 @@ public class Main extends JavaPlugin implements Listener {
 					return true;
 					
 				}
+				
+				else {
+					player.sendMessage(ChatColor.RED + "Not a valid command!");
+					return true;
+				}
+					
+				
 			}
+				}
 		}
-		return false;
+		return true;
 	}
 
 	@EventHandler
