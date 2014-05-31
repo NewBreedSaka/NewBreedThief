@@ -15,6 +15,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -347,8 +348,8 @@ public class Main extends JavaPlugin implements Listener {
 
 		standard1 = new ItemStack(Material.FEATHER);
 		ItemMeta im4 = standard1.getItemMeta();
-		im4.setDisplayName(ChatColor.AQUA + "StandardThief");
-		im4.setLore(Arrays.asList(ChatColor.DARK_PURPLE + " Backstabs Guards "));
+		im4.setDisplayName(ChatColor.AQUA + "Standard Thief");
+		im4.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Backstabs Guards"));
 		standard1.setItemMeta(im4);		
 
 
@@ -541,6 +542,7 @@ public class Main extends JavaPlugin implements Listener {
 		ItemStack item = new ItemStack(Material.FEATHER);
 		ItemMeta itemMeta = item.getItemMeta();
 		itemMeta.setDisplayName("§5Thieves dagger");
+		itemMeta.addEnchant(Enchantment.DAMAGE_ALL, 1, true);
 		ArrayList<String> itemLore = new ArrayList<String>();
 		itemLore.add("§7Left click to stab");
 		itemLore.add("§7Right click to activate " + action + "!");
