@@ -41,8 +41,8 @@ public class Items {
 		itemMeta.setDisplayName("§5Thieves dagger");
 		itemMeta.addEnchant(Enchantment.DAMAGE_ALL, 1, true);
 		ArrayList<String> itemLore = new ArrayList<String>();
-		itemLore.add("§6Left click §7to attack");
-		if (action != null)	itemLore.add("§6Right §7click to activate " + action + "!");
+		itemLore.add("§9Left click §7to attack");
+		if (action != null)	itemLore.add("§9Right click §7to activate " + action + "!");
 		itemMeta.setLore(itemLore);
 		item.setItemMeta(itemMeta);
 		return(item);
@@ -67,7 +67,7 @@ public class Items {
 		guardDefaultLore.add("§7Special ability grants brute force");
 		//TODO: add vault check if player has purchased as permission node will be added for all classes
 		guardDefaultLore.add("§fCost: None");
-		guardDefaultItemMeta.setDisplayName(ChatColor.AQUA + "Guard");
+		guardDefaultItemMeta.setDisplayName(ChatColor.AQUA + "Default Guard");
 		guardDefaultItemMeta.setLore(guardDefaultLore);
 		guardDefault.setItemMeta(guardDefaultItemMeta);		
 
@@ -116,7 +116,7 @@ public class Items {
 
 		thiefDefault = new ItemStack(Material.FEATHER);
 		ItemMeta thiefDefaultItemMeta = thiefDefault.getItemMeta();
-		thiefDefaultItemMeta.setDisplayName(ChatColor.AQUA + "Thief");
+		thiefDefaultItemMeta.setDisplayName(ChatColor.AQUA + "Default Thief");
 		thiefDefaultItemMeta.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Backstabs Guards"));
 		ArrayList<String> thiefDefaultLore = new ArrayList<String>();
 		thiefDefaultLore.add("§7Special ability casts dash");

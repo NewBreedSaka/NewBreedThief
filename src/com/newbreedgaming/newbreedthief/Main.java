@@ -30,6 +30,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -38,6 +39,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Chest;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -60,13 +62,13 @@ public class Main extends JavaPlugin implements Listener {
 	public Team thiefTeam;
 	public Team guardTeam;
 	public Score artifactsScore;
-	
+
 	//cooldowns
 	public HashMap<String, Long> fireOfRevealing = new HashMap<String, Long>();
 	public HashMap<String, Long> shadowMeldCooldown = new HashMap<String, Long>();
 	//classes
 	public HashMap<String, String> selectedKit = new HashMap<String, String>();
-	
+
 	ItemStack kitSelector;
 
 	Logger logger = Logger.getLogger("Minecraft");
@@ -79,7 +81,7 @@ public class Main extends JavaPlugin implements Listener {
 		im.setDisplayName("Kit Selector");
 		im.setLore(Arrays.asList("Choose your kit!"));
 		kitSelector.setItemMeta(im);
-		
+
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		this.getConfig().options().copyDefaults(true);
 		EffectLib lib = EffectLib.instance();
@@ -106,12 +108,12 @@ public class Main extends JavaPlugin implements Listener {
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			//add player to team with less players
-			
+
 
 			if(p.getInventory().contains(Material.NETHER_STAR) == false){
 				p.getInventory().addItem(kitSelector);
 			}
-		
+
 			if(Teams.getGuards().size() < Teams.getThieves().size()) {
 				Teams.addToTeam(TeamType.GUARD, p, thiefTeam, guardTeam);
 			} else {
@@ -159,19 +161,19 @@ public class Main extends JavaPlugin implements Listener {
 		if(player.getInventory().contains(Material.NETHER_STAR) == false){
 			player.getInventory().addItem(kitSelector);
 		}
-		
+
 		// If enough players joined start game
 		if(Bukkit.getOnlinePlayers().length >= Integer.parseInt(getConfig().getString("Playerstostart"))) {
 			startGame();
 		}
 
 	}
-	
+
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e ){
 		Player player = (Player) e.getPlayer();
 		player.getInventory().remove(Material.NETHER_STAR);
-		
+
 	}
 
 	@Override
@@ -181,73 +183,73 @@ public class Main extends JavaPlugin implements Listener {
 			if (player.isOp() == true) {
 				if(commandLabel.equalsIgnoreCase("thief")){
 					if(args.length == 0){
-						
+
 						player.sendMessage(ChatColor.RED + "Specifiy another command!");
 						return true;
 					}
-				
-				if (args[0].equalsIgnoreCase("setthievesspawn")) {
-					
-					getConfig().set("Thieves.x",
-							player.getLocation().getBlockX());
-					getConfig().set("Thieves.y",
-							player.getLocation().getBlockY());
-					getConfig().set("Thieves.z",
-							player.getLocation().getBlockZ());
-					saveConfig();
-					player.sendMessage(ChatColor.GOLD + "Thieves spawn set");
-					
-					return true;
-					
-				} else if (args[0].equalsIgnoreCase("setguardsspawn")) {
-					
-					getConfig().set("Guards.x",
-							player.getLocation().getBlockX());
-					getConfig().set("Guards.y",
-							player.getLocation().getBlockY());
-					getConfig().set("Guards.z",
-							player.getLocation().getBlockZ());
-					saveConfig();
-					player.sendMessage(ChatColor.GOLD + "Guards spawn set");
-					
-					return true;
-					
-				} else if (args[0].equalsIgnoreCase("addartifact")) {
-					
-					int newArtifact = getConfig().getInt("NewestArtifact") + 1;
-					getConfig().set("Artifact." + newArtifact + ".x",
-							player.getLocation().getBlockX());
-					getConfig().set("Artifact." + newArtifact + ".y",
-							player.getLocation().getBlockY());
-					getConfig().set("Artifact." + newArtifact + ".z",
-							player.getLocation().getBlockZ());
-					getConfig().set("NewestArtifact", newArtifact++);
-					saveConfig();
-					player.sendMessage("Added artifact spawn point at feet");
 
-					return true;
-					
-				} else if (args[0].equalsIgnoreCase("spawnartifact")) {
-					
-					int thievesX = getConfig().getInt("Artifact.1.x");
-					int thievesY = getConfig().getInt("Artifact.1.y");
-					int thievesZ = getConfig().getInt("Artifact.1.z");
-					Location artifact = new Location(player.getWorld(), thievesX, thievesY, thievesZ);
-					Block artifactBlock = player.getWorld().getBlockAt(artifact);
-					artifactBlock.setType(Material.DRAGON_EGG);
-					
-					return true;
-					
+					if (args[0].equalsIgnoreCase("setthievesspawn")) {
+
+						getConfig().set("Thieves.x",
+								player.getLocation().getBlockX());
+						getConfig().set("Thieves.y",
+								player.getLocation().getBlockY());
+						getConfig().set("Thieves.z",
+								player.getLocation().getBlockZ());
+						saveConfig();
+						player.sendMessage(ChatColor.GOLD + "Thieves spawn set");
+
+						return true;
+
+					} else if (args[0].equalsIgnoreCase("setguardsspawn")) {
+
+						getConfig().set("Guards.x",
+								player.getLocation().getBlockX());
+						getConfig().set("Guards.y",
+								player.getLocation().getBlockY());
+						getConfig().set("Guards.z",
+								player.getLocation().getBlockZ());
+						saveConfig();
+						player.sendMessage(ChatColor.GOLD + "Guards spawn set");
+
+						return true;
+
+					} else if (args[0].equalsIgnoreCase("addartifact")) {
+
+						int newArtifact = getConfig().getInt("NewestArtifact") + 1;
+						getConfig().set("Artifact." + newArtifact + ".x",
+								player.getLocation().getBlockX());
+						getConfig().set("Artifact." + newArtifact + ".y",
+								player.getLocation().getBlockY());
+						getConfig().set("Artifact." + newArtifact + ".z",
+								player.getLocation().getBlockZ());
+						getConfig().set("NewestArtifact", newArtifact++);
+						saveConfig();
+						player.sendMessage("Added artifact spawn point at feet");
+
+						return true;
+
+					} else if (args[0].equalsIgnoreCase("spawnartifact")) {
+
+						int thievesX = getConfig().getInt("Artifact.1.x");
+						int thievesY = getConfig().getInt("Artifact.1.y");
+						int thievesZ = getConfig().getInt("Artifact.1.z");
+						Location artifact = new Location(player.getWorld(), thievesX, thievesY, thievesZ);
+						Block artifactBlock = player.getWorld().getBlockAt(artifact);
+						artifactBlock.setType(Material.DRAGON_EGG);
+
+						return true;
+
+					}
+
+					else {
+						player.sendMessage(ChatColor.RED + "Not a valid command!");
+						return true;
+					}
+
+
 				}
-				
-				else {
-					player.sendMessage(ChatColor.RED + "Not a valid command!");
-					return true;
-				}
-					
-				
 			}
-				}
 		}
 		return true;
 	}
@@ -332,7 +334,7 @@ public class Main extends JavaPlugin implements Listener {
 			if(i.getType().equals(Material.NETHER_STAR)){
 
 				if(Teams.isThief(player) == true){
-					
+
 					player.openInventory(Items.createClassMenu("Thief"));
 				}
 
@@ -491,7 +493,7 @@ public class Main extends JavaPlugin implements Listener {
 						countdowntimer--;
 					} else {
 						Bukkit.broadcastMessage(ChatColor.GOLD + "Let the game begin!");
-					
+
 
 
 						int thievesX = getConfig().getInt("Thieves.x");
@@ -520,11 +522,11 @@ public class Main extends JavaPlugin implements Listener {
 							giveKits(player);
 
 							player.teleport(new Location(player.getWorld(), guardsX, guardsY, guardsZ));
-							
+
 							if(player.getInventory().contains(Material.NETHER_STAR)){
 								player.getInventory().remove(Material.NETHER_STAR);
 							}
-							
+
 						}
 						gameBegun = true;
 						countdowntimer--; // set count down timer to -1 so the scheduler does not run any further.
@@ -535,59 +537,78 @@ public class Main extends JavaPlugin implements Listener {
 		}, 200L, 20L);
 
 	}
+
+	@EventHandler
+	public void onInventoryDrag(InventoryDragEvent event)
+	{
+		Player player = (Player)event.getWhoClicked();
+
+		if (event.getInventory().getTitle().contains("Pick Your Guard Class")) {
+			event.setCancelled(true);
+			player.updateInventory();
+			player.closeInventory();
+		}
+	}
+
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
-		String iName = e.getCurrentItem().getItemMeta().getDisplayName();
-		if (e.getInventory().getTitle().equalsIgnoreCase("Pick Your Guard Class") || e.getInventory().getTitle().equalsIgnoreCase("Pick Your Thief Class")) {
-			if (e.getCurrentItem().getItemMeta() == null) return;
-			
-			//Guards
-			if (iName.contains("Standard Guard")) {
-				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected the Standard Guard kit!");
-				selectedKit.put(p.getName(), "Default");
-				p.closeInventory();
-				return;
-			} else if (iName.contains("Scout")) {
-				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected the Scout kit!");
-				selectedKit.put(p.getName(), "Scout");
-				p.closeInventory();
-				return;
-			} else if (iName.contains("Heavy")) {
-				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected the Heavy kit!");
-				selectedKit.put(p.getName(), "Heavy");
-				p.closeInventory();
-				return;
-			} else if (iName.contains("Mage")) {
-				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected the Mage kit!");
-				p.closeInventory();
-				selectedKit.put(p.getName(), "Mage");
-				return;
-			} else if (iName.contains("Smoke")) { //Thieves
-				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected the Smoke kit!");
-				selectedKit.put(p.getName(), "Smoke");
-				p.closeInventory();
-				return;
-			} else if (iName.contains("StandardThief")) {
-				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected the Standard Thief kit!");
-				selectedKit.put(p.getName(), "Default");
-				p.closeInventory();
-				return;
-			} else if (iName.contains("Shadow Step")) {
-				e.setCancelled(true);
-				p.sendMessage(ChatColor.GREEN + "You selected the Blink kit!");
-				selectedKit.put(p.getName(), "Blink");
-				p.closeInventory();
-				return;
+		Inventory destInvent = e.getInventory();
+		Integer slotClicked = e.getRawSlot();
+		if( slotClicked < destInvent.getSize() ) {
+			// slot clicked was in the remote container, not in the player
+			String itemName = e.getCurrentItem().getItemMeta().getDisplayName();
+			if (e.getInventory().getTitle().equalsIgnoreCase("Pick Your Guard Class") || e.getInventory().getTitle().equalsIgnoreCase("Pick Your Thief Class")) {
+				if (e.getCurrentItem().getItemMeta() == null) return;			
+				//Guards
+				if (itemName.contains("Guard")) {
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.GREEN + "You selected the Standard Guard kit!");
+					selectedKit.put(p.getName(), "Default");
+					p.closeInventory();
+					return;
+				} else if (itemName.contains("Scout")) {
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.GREEN + "You selected the Scout kit!");
+					selectedKit.put(p.getName(), "Scout");
+					p.closeInventory();
+					return;
+				} else if (itemName.contains("Heavy")) {
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.GREEN + "You selected the Heavy kit!");
+					selectedKit.put(p.getName(), "Heavy");
+					p.closeInventory();
+					return;
+				} else if (itemName.contains("Mage")) {
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.GREEN + "You selected the Mage kit!");
+					p.closeInventory();
+					selectedKit.put(p.getName(), "Mage");
+					return;
+				} else if (itemName.contains("Smoke")) { //Thieves
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.GREEN + "You selected the Smoke kit!");
+					selectedKit.put(p.getName(), "Smoke");
+					p.closeInventory();
+					return;
+				} else if (itemName.contains("Thief")) {
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.GREEN + "You selected the Standard Thief kit!");
+					selectedKit.put(p.getName(), "Default");
+					p.closeInventory();
+					return;
+				} else if (itemName.contains("Shadow Step")) {
+					e.setCancelled(true);
+					p.sendMessage(ChatColor.GREEN + "You selected the Blink kit!");
+					selectedKit.put(p.getName(), "Blink");
+					p.closeInventory();
+					return;
+				}
 			}
-
+		} else {
+			// slot clicked was in the player, not the remote container
 		}
+
 	}
 
 	public void giveKits(Player p){
@@ -602,46 +623,46 @@ public class Main extends JavaPlugin implements Listener {
 			p.getInventory().addItem(Items.createThiefDagger(null));
 			p.getInventory().addItem(Items.createEgg(16));
 			p.sendMessage(ChatColor.BLUE + "Kit recieved!");
-			
+
 			return;
-			
+
 		} else if(selectedKit.get(p.getName()) == "Blink"){
 			p.getInventory().addItem(Items.createThiefDagger("shadow step"));
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
-			
+
 			return;
-			
+
 		} else if(selectedKit.get(p.getName()) == "Scout"){
 
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
-			
+
 			return;
-			
+
 		} else if(selectedKit.get(p.getName()) == "Heavy"){
 
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
 
 			return;
-			
+
 		} else if(selectedKit.get(p.getName()) == "Mage"){
-			
+
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
 
 			return;
 
 		} else {
-			
+
 			if (Teams.isThief(p) == true) {
 				p.getInventory().addItem(Items.createThiefDagger("special ability"));
 			}
 			p.sendMessage(ChatColor.RED + "No kit selected, applying default.");
-			
+
 			return;
-			
+
 		}
-		
+
 	}
-	
-	
+
+
 
 }
