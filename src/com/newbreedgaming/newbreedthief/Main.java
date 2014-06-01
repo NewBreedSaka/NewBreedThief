@@ -146,6 +146,11 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
+		
+		
+			sqlf.createPlayer(player);
+		
+		
 		player.sendMessage("§6Welcome to thief");
 
 		player.setScoreboard(board);
