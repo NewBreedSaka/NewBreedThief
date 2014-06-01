@@ -13,10 +13,10 @@ public class SQLFunctions {
 	Main plugin;
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	static final String DB_URL = "jdbc:mysql://localhost/POINTS";
+	static final String DB_URL = "jdbc:mysql://http://76.74.200.77/playerdata";
 	//  Database credentials
-	static final String USER = "user";
-	static final String PASS = "pass";
+	static final String USER = "root";
+	static final String PASS = "w6m5Ox90Sv";
 	Statement stmt;
 	Connection conn;
 	public SQLFunctions(Main plugin){
@@ -33,7 +33,7 @@ public class SQLFunctions {
 		
 			stmt = conn.createStatement();
 			String sql = "CREATE TABLE " +  p.getName() + "( Kills int, Deaths int, TPoints int , UTPoints int, Wins int, Losses int, UUID varchar(255))"; 
-			String asql = "INSERT INTO equinoxdev (UUID) VALUES ('"+ p.getUniqueId() +"');";
+			String asql = "INSERT INTO " + p.getName() + "(UUID) VALUES ('"+ p.getUniqueId() +"');";
 			stmt.executeUpdate(asql);
 			stmt.executeUpdate(sql);
 		}catch(SQLException se){
@@ -66,7 +66,7 @@ public class SQLFunctions {
 			stmt = conn.createStatement();
 			
 			
-			String sql = "UPDATE equinoxdev SET Kills=Kills+1 WHERE UUID='12'";
+			String sql = "UPDATE " + p.getName() + "SET Kills=Kills+1 WHERE UUID='"+ p.getUniqueId() + "'";
 			
 			
 			
