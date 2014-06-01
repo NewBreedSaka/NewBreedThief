@@ -60,18 +60,14 @@ public class Main extends JavaPlugin implements Listener {
 	public Team thiefTeam;
 	public Team guardTeam;
 	public Score artifactsScore;
+	
+	//cooldowns
 	public HashMap<String, Long> fireOfRevealing = new HashMap<String, Long>();
 	public HashMap<String, Long> shadowMeldCooldown = new HashMap<String, Long>();
-
-
+	//classes
 	public HashMap<String, String> selectedKit = new HashMap<String, String>();
 	
 	ItemStack kitSelector;
-
-	Inventory guardInv;
-	Inventory thiefInv;
-	ItemStack standard, scout, heavy, mage;
-	ItemStack standard1, smoke, blink;
 
 	Logger logger = Logger.getLogger("Minecraft");
 
@@ -325,71 +321,6 @@ public class Main extends JavaPlugin implements Listener {
 
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
-
-		guardInv = Bukkit.createInventory(null, 9, "Pick Your Guard Class"); 
-
-		standard = new ItemStack(Material.LEATHER_CHESTPLATE);
-		ItemMeta im = standard.getItemMeta();
-		im.setLore(Arrays.asList(ChatColor.DARK_PURPLE + " Normal armour, no access to walkways ability grants strength"));
-		im.setDisplayName(ChatColor.AQUA + "StandardGuard");
-		standard.setItemMeta(im);		
-
-
-		scout = new ItemStack(Material.POTION);
-		ItemMeta im1 = scout.getItemMeta();
-		im1.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Use Thief pathways, and has dash ability"));
-		im1.setDisplayName(ChatColor.AQUA + "Scout");
-		scout.setItemMeta(im1);	
-
-		heavy = new ItemStack(Material.BREAD);
-		ItemMeta im2 = heavy.getItemMeta();
-		im2.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Increase Health"));
-		im2.setDisplayName(ChatColor.AQUA + "Heavy");
-		heavy.setItemMeta(im2);	
-
-		mage = new ItemStack(Material.FIRE);
-		ItemMeta im3 = mage.getItemMeta();
-		im3.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Use the fire of revealing spell to un-shadowmeld thieves"));
-		im3.setDisplayName(ChatColor.AQUA + "Mage");
-		mage.setItemMeta(im3);	
-
-
-		guardInv.addItem(new ItemStack(standard));
-		guardInv.addItem(new ItemStack(scout));
-		guardInv.addItem(new ItemStack(heavy));
-		guardInv.addItem(new ItemStack(mage));
-
-		thiefInv = Bukkit.createInventory(null, 9, "Pick Your Thief Class"); 
-
-		standard1 = new ItemStack(Material.FEATHER);
-		ItemMeta im4 = standard1.getItemMeta();
-		im4.setDisplayName(ChatColor.AQUA + "Standard Thief");
-		im4.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Backstabs Guards"));
-		standard1.setItemMeta(im4);		
-
-
-		smoke = new ItemStack(Material.EGG);
-		ItemMeta im12 = smoke.getItemMeta();
-		im12.setDisplayName(ChatColor.AQUA + "Smoke");
-		im12.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "Access to smoke eggs which blind guards to make killing easier"));
-		smoke.setItemMeta(im12);	
-
-		blink = new ItemStack(Material.COMPASS);
-		ItemMeta im23 = blink.getItemMeta();
-		im23.setDisplayName(ChatColor.AQUA + "Blink");
-		im23.setLore(Arrays.asList(ChatColor.DARK_PURPLE + "May jump several blocks towards the nearest guard it a teleportation style "));
-		blink.setItemMeta(im23);	
-
-
-
-
-		thiefInv.addItem(new ItemStack(standard1));
-		thiefInv.addItem(new ItemStack(smoke));
-		thiefInv.addItem(new ItemStack(blink));
-
-
-
-
 		Player player = event.getPlayer();
 		ItemStack item = event.getItem();
 
@@ -401,11 +332,12 @@ public class Main extends JavaPlugin implements Listener {
 			if(i.getType().equals(Material.NETHER_STAR)){
 
 				if(Teams.isThief(player) == true){
-					player.openInventory(thiefInv);
+					
+					player.openInventory(Items.createClassMenu("Thief"));
 				}
 
 				if(Teams.isThief(player) == false){
-					player.openInventory(guardInv);
+					player.openInventory(Items.createClassMenu("Guard"));
 				}
 
 
@@ -421,7 +353,7 @@ public class Main extends JavaPlugin implements Listener {
 
 				player.sendMessage("You have picked up an artifact!");
 
-				ItemStack artifact = createArtifact();
+				ItemStack artifact = Items.createArtifact();
 				if (player.getInventory().contains(artifact) != true) {
 					event.getClickedBlock().setType(Material.AIR); //Remove Dragon Egg
 					player.getInventory().addItem(new ItemStack(artifact)); //Give thief dragon egg item
@@ -501,7 +433,7 @@ public class Main extends JavaPlugin implements Listener {
 		if (block.getType() == Material.BEDROCK && event.getBlockPlaced().getType() == Material.DRAGON_EGG) {
 			artifactsScore.setScore(artifactsScore.getScore() + 1);
 			event.setCancelled(true);
-			ItemStack artifact = createArtifact();
+			ItemStack artifact = Items.createArtifact();
 
 			if (player.getInventory().contains(artifact)){
 				player.getInventory().remove(artifact);
@@ -529,41 +461,6 @@ public class Main extends JavaPlugin implements Listener {
 		}
 
 		return found;
-	}
-
-	public ItemStack createArtifact() {
-		ItemStack artifact = new ItemStack(Material.DRAGON_EGG, 1);
-		ItemMeta artifactMeta = artifact.getItemMeta();
-		artifactMeta.setDisplayName("§6Artifact");
-		ArrayList<String> artifactLore = new ArrayList<String>();
-		artifactLore.add("§7Get this back to the thieves guild!");
-		artifactMeta.setLore(artifactLore);
-		artifact.setItemMeta(artifactMeta);
-		return(artifact);
-	}
-
-	public ItemStack createEgg(int amount) {
-		ItemStack item = new ItemStack(Material.EGG, amount);
-		ItemMeta itemMeta = item.getItemMeta();
-		itemMeta.setDisplayName("§5Blinding Bomb");
-		ArrayList<String> itemLore = new ArrayList<String>();
-		itemLore.add("§7Throw this at the guards to blind them!");
-		itemMeta.setLore(itemLore);
-		item.setItemMeta(itemMeta);
-		return(item);
-	}
-	
-	public ItemStack createThiefDagger(String action) {
-		ItemStack item = new ItemStack(Material.FEATHER);
-		ItemMeta itemMeta = item.getItemMeta();
-		itemMeta.setDisplayName("§5Thieves dagger");
-		itemMeta.addEnchant(Enchantment.DAMAGE_ALL, 1, true);
-		ArrayList<String> itemLore = new ArrayList<String>();
-		itemLore.add("§7Left click to stab");
-		itemLore.add("§7Right click to activate " + action + "!");
-		itemMeta.setLore(itemLore);
-		item.setItemMeta(itemMeta);
-		return(item);
 	}
 
 	public boolean checkCooldown(HashMap<String, Long> cooldowns, Player player, int cooldownTime, String action) {
@@ -682,7 +579,7 @@ public class Main extends JavaPlugin implements Listener {
 				selectedKit.put(p.getName(), "Default");
 				p.closeInventory();
 				return;
-			} else if (iName.contains("Blink")) {
+			} else if (iName.contains("Shadow Step")) {
 				e.setCancelled(true);
 				p.sendMessage(ChatColor.GREEN + "You selected the Blink kit!");
 				selectedKit.put(p.getName(), "Blink");
@@ -696,19 +593,20 @@ public class Main extends JavaPlugin implements Listener {
 	public void giveKits(Player p){
 
 		if(selectedKit.get(p.getName()) == "Scout"){
-			p.getInventory().addItem(createThiefDagger("speed boost"));
+			p.getInventory().addItem(Items.createThiefDagger("dash"));
 			p.sendMessage(ChatColor.BLUE + "Kit recieved!");
 
 			return;
 
 		} else if(selectedKit.get(p.getName()) == "Smoke"){
-			p.getInventory().addItem(createEgg(16));
+			p.getInventory().addItem(Items.createThiefDagger(null));
+			p.getInventory().addItem(Items.createEgg(16));
 			p.sendMessage(ChatColor.BLUE + "Kit recieved!");
 			
 			return;
 			
 		} else if(selectedKit.get(p.getName()) == "Blink"){
-
+			p.getInventory().addItem(Items.createThiefDagger("shadow step"));
 			p.sendMessage(ChatColor.RED + "Kit comming soon!");
 			
 			return;
@@ -734,7 +632,7 @@ public class Main extends JavaPlugin implements Listener {
 		} else {
 			
 			if (Teams.isThief(p) == true) {
-				p.getInventory().addItem(createThiefDagger("special ability"));
+				p.getInventory().addItem(Items.createThiefDagger("special ability"));
 			}
 			p.sendMessage(ChatColor.RED + "No kit selected, applying default.");
 			
