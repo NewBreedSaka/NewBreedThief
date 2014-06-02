@@ -418,6 +418,11 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity().getPlayer();
+		
+		
+			Player pl = (Player) event.getEntity().getKiller();
+			sqlf.addKill(pl);
+			sqlf.addDeath(player);
 		if (player.getInventory().contains(Material.DRAGON_EGG)) {
 			int artifacts = itemsInInventory(player.getInventory(), Material.DRAGON_EGG);
 			if (artifacts>0) {
