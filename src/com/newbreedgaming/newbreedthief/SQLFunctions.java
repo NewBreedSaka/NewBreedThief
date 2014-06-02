@@ -3,9 +3,9 @@ package com.newbreedgaming.newbreedthief;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
@@ -30,11 +30,15 @@ public class SQLFunctions {
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
 			DatabaseMetaData dbm = conn.getMetaData();
 			// check if "employee" table is there
-		
+
+
+
+
 			stmt = conn.createStatement();
-			String sql = "CREATE TABLE " +  p.getName() + "( Kills int, Deaths int, TPoints int , UTPoints int, Wins int, Losses int, UUID varchar(255))"; 
-			String asql = "INSERT INTO " + p.getName() + "(UUID) VALUES ('"+ p.getUniqueId() +"');";
-			
+			UUID uuid = p.getUniqueId();
+			String sql = "INSERT INTO Players(TalentsSurefooted, TalentsFocused, TalentsSteadyHand, TalentsConcealed, Deaths, Kills, Losses, Talents, UnusedTalents, Username,  UUID, Wins )  VALUES ( 0, 0, 0, 0, 0, 0, 0, 0, 0,  '" + p.getName() + "' , '" + p.getUniqueId() + "' ,0 )"; 
+
+
 			stmt.executeUpdate(sql);
 		}catch(SQLException se){
 			//Handle errors for JDBC
@@ -57,19 +61,24 @@ public class SQLFunctions {
 			}//end finally try
 		}//end try
 	}
+
 	
-	public void IncrementDeaths(Player p){
+	
+	public void addDeath(Player p){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			conn = DriverManager.getConnection(DB_URL, USER, PASS);
-		
+			DatabaseMetaData dbm = conn.getMetaData();
+			// check if "employee" table is there
+
+
+
+
 			stmt = conn.createStatement();
-			
-			
-			String sql = "UPDATE " + p.getName() + "SET Kills=Kills+1 WHERE UUID='"+ p.getUniqueId() + "'";
-			
-			
-			
+			UUID uuid = p.getUniqueId();
+			String sql = "UPDATE Players SET Deaths=Deaths+1   WHERE UUID='" + p.getUniqueId() + "';"; 
+
+
 			stmt.executeUpdate(sql);
 		}catch(SQLException se){
 			//Handle errors for JDBC
@@ -90,36 +99,94 @@ public class SQLFunctions {
 			}catch(SQLException se){
 				se.printStackTrace();
 			}//end finally try
-		}//end try
+		}//en
+	}
+
+
+	public void addKill(Player p){
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			DatabaseMetaData dbm = conn.getMetaData();
+			// check if "employee" table is there
+
+
+
+
+			stmt = conn.createStatement();
+			
+			String sql = "UPDATE Players SET Kills=Kills+1   WHERE UUID='" + p.getUniqueId() + "';"; 
+
+
+			stmt.executeUpdate(sql);
+		}catch(SQLException se){
+			//Handle errors for JDBC
+			se.printStackTrace();
+		}catch(Exception e){
+			//Handle errors for Class.forName
+			e.printStackTrace();
+		}finally{
+			//finally block used to close resources
+			try{
+				if(stmt!=null)
+					conn.close();
+			}catch(SQLException se){
+			}// do nothing
+			try{
+				if(conn!=null)
+					conn.close();
+			}catch(SQLException se){
+				se.printStackTrace();
+			}//end finally try
+		}//en
+	}
+
+	
+	public void updatePlayer(Player p){
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			DatabaseMetaData dbm = conn.getMetaData();
+			// check if "employee" table is there
+
+
+
+
+			stmt = conn.createStatement();
+			UUID uuid = p.getUniqueId();
+			String sql = "UPDATE Players SET Username='" + p.getName() +"' WHERE UUID='" + p.getUniqueId()+"';"; 
+
+
+			stmt.executeUpdate(sql);
+		}catch(SQLException se){
+			//Handle errors for JDBC
+			se.printStackTrace();
+		}catch(Exception e){
+			//Handle errors for Class.forName
+			e.printStackTrace();
+		}finally{
+			//finally block used to close resources
+			try{
+				if(stmt!=null)
+					conn.close();
+			}catch(SQLException se){
+			}// do nothing
+			try{
+				if(conn!=null)
+					conn.close();
+			}catch(SQLException se){
+				se.printStackTrace();
+			}//end finally try
+		}//end tr
+		
 		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public void getCurrentDeaths(String p, int deaths){
-		
-		
-	}
+
+
+
+
+
+
 
 
 }
