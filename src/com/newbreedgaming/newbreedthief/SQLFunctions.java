@@ -156,6 +156,86 @@ public class SQLFunctions {
 		}//en
 	}
 
+	
+	public void setKill(Player p, int value){
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			DatabaseMetaData dbm = conn.getMetaData();
+			// check if "employee" table is there
+			value = value-1;
+
+
+
+
+			stmt = conn.createStatement();
+			
+			String sql = "UPDATE Players SET Kills=  '" +value + "'   WHERE UUID='" + p.getUniqueId() + "';"; 
+			
+
+
+			stmt.executeUpdate(sql);
+		}catch(SQLException se){
+			//Handle errors for JDBC
+			se.printStackTrace();
+		}catch(Exception e){
+			//Handle errors for Class.forName
+			e.printStackTrace();
+		}finally{
+			//finally block used to close resources
+			try{
+				if(stmt!=null)
+					conn.close();
+			}catch(SQLException se){
+			}// do nothing
+			try{
+				if(conn!=null)
+					conn.close();
+			}catch(SQLException se){
+				se.printStackTrace();
+			}//end finally try
+		}//en
+	}
+	
+	public void setDeath(Player p, int value){
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = DriverManager.getConnection(DB_URL, USER, PASS);
+			DatabaseMetaData dbm = conn.getMetaData();
+			// check if "employee" table is there
+			value = value-1;
+
+
+
+
+			stmt = conn.createStatement();
+			
+			String sql = "UPDATE Players SET Deaths=  '" +value + "'   WHERE UUID='" + p.getUniqueId() + "';"; 
+			
+
+
+			stmt.executeUpdate(sql);
+		}catch(SQLException se){
+			//Handle errors for JDBC
+			se.printStackTrace();
+		}catch(Exception e){
+			//Handle errors for Class.forName
+			e.printStackTrace();
+		}finally{
+			//finally block used to close resources
+			try{
+				if(stmt!=null)
+					conn.close();
+			}catch(SQLException se){
+			}// do nothing
+			try{
+				if(conn!=null)
+					conn.close();
+			}catch(SQLException se){
+				se.printStackTrace();
+			}//end finally try
+		}//en
+	}
 
 	public void addWin(Player p){
 		try{
