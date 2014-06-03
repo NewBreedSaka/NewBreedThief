@@ -62,6 +62,7 @@ public class Main extends JavaPlugin implements Listener {
 	public Team thiefTeam;
 	public Team guardTeam;
 	public Score artifactsScore;
+	SQLFunctions sqlf;
 
 	//cooldowns
 	public HashMap<String, Long> fireOfRevealing = new HashMap<String, Long>();
@@ -146,11 +147,11 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		
-		
-			sqlf.createPlayer(player);
-		
-		
+
+		if (!player.hasPlayedBefore()) sqlf.createPlayer(player);
+		sqlf.updatePlayer(player);
+
+
 		player.sendMessage("§6Welcome to thief");
 
 		player.setScoreboard(board);
@@ -418,11 +419,11 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity().getPlayer();
-		
-		
-			Player pl = (Player) event.getEntity().getKiller();
-			sqlf.addKill(pl);
-			sqlf.addDeath(player);
+
+
+		Player pl = (Player) event.getEntity().getKiller();
+		sqlf.addKill(pl);
+		sqlf.addDeath(player);
 		if (player.getInventory().contains(Material.DRAGON_EGG)) {
 			int artifacts = itemsInInventory(player.getInventory(), Material.DRAGON_EGG);
 			if (artifacts>0) {
@@ -444,6 +445,12 @@ public class Main extends JavaPlugin implements Listener {
 		Block block = placedOn.getBlock();
 		if (block.getType() == Material.BEDROCK && event.getBlockPlaced().getType() == Material.DRAGON_EGG) {
 			artifactsScore.setScore(artifactsScore.getScore() + 1);
+			if (artifactsScore.getScore() == getConfig().getInt("ArtifactsToWin")) {
+				//cancel game scheduler
+				//end game
+				gameWin("THIEF");
+				Bukkit.broadcastMessage(ChatColor.GOLD + "The Thieves have won the game!");
+			}
 			event.setCancelled(true);
 			ItemStack artifact = Items.createArtifact();
 
@@ -546,6 +553,31 @@ public class Main extends JavaPlugin implements Listener {
 
 		}, 200L, 20L);
 
+	}
+	
+	public void gameWin(String team) {
+		for(Player p : Bukkit.getOnlinePlayers()){
+			p.getInventory().clear();
+			if (team == "THIEF") {
+				if (Teams.isInTeam(p)) {
+					if (Teams.isThief(p)) {
+						sqlf.addWin(p);
+					} else {
+						sqlf.addLost(p);
+					}
+				}
+			} else {
+				if (Teams.isInTeam(p)) {
+					if (!Teams.isThief(p)) {
+						sqlf.addWin(p);
+					} else {
+						sqlf.addLost(p);
+					}
+				}
+			}
+			
+			
+		}
 	}
 
 	@EventHandler

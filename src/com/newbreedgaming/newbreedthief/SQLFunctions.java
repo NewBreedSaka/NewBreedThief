@@ -34,9 +34,6 @@ public class SQLFunctions {
 			DatabaseMetaData dbm = conn.getMetaData();
 			// check if "employee" table is there
 
-
-
-
 			stmt = conn.createStatement();
 			UUID uuid = p.getUniqueId();
 			String sql = "INSERT INTO Players(TalentsSurefooted, TalentsFocused, TalentsSteadyHand, TalentsConcealed, Deaths, Kills, Losses, Talents, UnusedTalents, Username,  UUID, Wins )  VALUES ( 0, 0, 0, 0, 0, 0, 0, 0, 0,  '" + p.getName() + "' , '" + p.getUniqueId() + "' ,0 )"; 
@@ -65,8 +62,8 @@ public class SQLFunctions {
 		}//end try
 	}
 
-	
-	
+
+
 	public void addDeath(Player p){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
@@ -80,13 +77,13 @@ public class SQLFunctions {
 			stmt = conn.createStatement();
 			UUID uuid = p.getUniqueId();
 			String sql = "UPDATE Players SET Deaths=Deaths+1   WHERE UUID='" + p.getUniqueId() + "';"; 
-			
-			
-			
-			
+
+
+
+
 			ResultSet set = stmt.executeQuery("SELECT Deaths FROM Players WHERE UUID='" + p.getUniqueId() + "';");
 			if (set.next()){
-			 Deaths = set.getInt("Deaths");
+				Deaths = set.getInt("Deaths");
 			}
 
 
@@ -125,11 +122,11 @@ public class SQLFunctions {
 
 
 			stmt = conn.createStatement();
-			
+
 			String sql = "UPDATE Players SET Kills=Kills+1   WHERE UUID='" + p.getUniqueId() + "';"; 
 			ResultSet set = stmt.executeQuery("SELECT Kills FROM Players WHERE UUID='" + p.getUniqueId() + "';");
 			if (set.next()){
-			 Kills = set.getInt("Kills");
+				Kills = set.getInt("Kills");
 			}
 
 
@@ -156,7 +153,7 @@ public class SQLFunctions {
 		}//en
 	}
 
-	
+
 	public void setKill(Player p, int value){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
@@ -169,9 +166,9 @@ public class SQLFunctions {
 
 
 			stmt = conn.createStatement();
-			
+
 			String sql = "UPDATE Players SET Kills=  '" +value + "'   WHERE UUID='" + p.getUniqueId() + "';"; 
-			
+
 
 
 			stmt.executeUpdate(sql);
@@ -196,7 +193,7 @@ public class SQLFunctions {
 			}//end finally try
 		}//en
 	}
-	
+
 	public void setDeath(Player p, int value){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
@@ -209,9 +206,9 @@ public class SQLFunctions {
 
 
 			stmt = conn.createStatement();
-			
+
 			String sql = "UPDATE Players SET Deaths=  '" +value + "'   WHERE UUID='" + p.getUniqueId() + "';"; 
-			
+
 
 
 			stmt.executeUpdate(sql);
@@ -248,7 +245,7 @@ public class SQLFunctions {
 
 
 			stmt = conn.createStatement();
-			
+
 			String sql = "UPDATE Players SET Wins=Wins+1   WHERE UUID='" + p.getUniqueId() + "';"; 
 
 
@@ -286,7 +283,7 @@ public class SQLFunctions {
 
 
 			stmt = conn.createStatement();
-			
+
 			String sql = "UPDATE Players SET Losses=Losses+1   WHERE UUID='" + p.getUniqueId() + "';"; 
 
 
@@ -312,9 +309,9 @@ public class SQLFunctions {
 			}//end finally try
 		}//en
 	}
-	
-	
-	
+
+
+
 	public void updatePlayer(Player p){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
@@ -350,9 +347,9 @@ public class SQLFunctions {
 			}catch(SQLException se){
 				se.printStackTrace();
 			}//end finally try
-		}//end tr
-		
-		
+		}//end try
+
+
 	}
 
 
