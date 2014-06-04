@@ -360,6 +360,11 @@ public class SQLFunctions {
 	public int getCurrentKills(){
 		return Kills+1;
 	}
+	public Double getTalentPoints(String talent) {
+		// TODO Auto-generated method stub
+		double val = 0;
+		return val;
+	}
 
 
 

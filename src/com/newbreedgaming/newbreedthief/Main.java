@@ -62,13 +62,26 @@ public class Main extends JavaPlugin implements Listener {
 	public Team thiefTeam;
 	public Team guardTeam;
 	public Score artifactsScore;
+	
+	//Initialise Classes
 	SQLFunctions sqlf;
 
 	//cooldowns
 	public HashMap<String, Long> fireOfRevealing = new HashMap<String, Long>();
 	public HashMap<String, Long> shadowMeldCooldown = new HashMap<String, Long>();
+	
 	//classes
 	public HashMap<String, String> selectedKit = new HashMap<String, String>();
+	
+	//talents
+	public HashMap<String, Double> talentSureFooted = new HashMap<String, Double>();
+	//Less chance of creak on beams
+	public HashMap<String, Double> talentFocused = new HashMap<String, Double>();
+	//Less cooldown on special abilities
+	public HashMap<String, Double> talentSteadyHand = new HashMap<String, Double>();
+	//Greater chance of lock picking success
+	public HashMap<String, Double> talentConcealed = new HashMap<String, Double>();
+	//Can shadowmeld at higher light levels or have a chance of resisting mages light of revealing
 
 	ItemStack kitSelector;
 
@@ -150,6 +163,9 @@ public class Main extends JavaPlugin implements Listener {
 
 		if (!player.hasPlayedBefore()) sqlf.createPlayer(player);
 		sqlf.updatePlayer(player);
+
+		talentFocused.put(player.getName(), sqlf.getTalentPoints("talent"));
+		// getTalentPoints not yet implemented
 
 
 		player.sendMessage("§6Welcome to thief");
@@ -554,7 +570,7 @@ public class Main extends JavaPlugin implements Listener {
 		}, 200L, 20L);
 
 	}
-	
+
 	public void gameWin(String team) {
 		for(Player p : Bukkit.getOnlinePlayers()){
 			p.getInventory().clear();
@@ -575,8 +591,8 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 			}
-			
-			
+
+
 		}
 	}
 
@@ -701,6 +717,24 @@ public class Main extends JavaPlugin implements Listener {
 
 			return;
 
+		}
+
+	}
+
+	public static double getTalentLevel(int talentPoints) {
+
+		double talentLevel = logB(2, talentPoints);
+
+		return talentLevel;
+
+	}
+
+	public static double logB(int base, int value) {
+
+		if (value == 0) {
+			return 0;
+		} else {
+			return Math.floor(Math.log(value) / Math.log(base));
 		}
 
 	}
