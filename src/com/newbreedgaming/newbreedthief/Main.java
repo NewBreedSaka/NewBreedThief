@@ -55,8 +55,8 @@ import de.slikey.effectlib.effect.HelixLocationEffect;
 
 public class Main extends JavaPlugin implements Listener {
 	private EffectManager effectManager;
-	public int countdownTimer = 30;
-	public int gameLength = 1200;
+	public int countdownTimer = 15; //should be 30
+	public int gameLength = 30; //should be 1200
 	public boolean gameBegun = false;
 	public Scoreboard board;
 	public Objective obj;
@@ -466,12 +466,6 @@ public class Main extends JavaPlugin implements Listener {
 		Block block = placedOn.getBlock();
 		if (block.getType() == Material.BEDROCK && event.getBlockPlaced().getType() == Material.DRAGON_EGG) {
 			artifactsScore.setScore(artifactsScore.getScore() + 1);
-			if ( (int)(artifactsScore.getScore()) == getConfig().getInt("ArtifactsToWin")) {
-				//cancel game scheduler
-				//end game
-				gameWin("THIEF");
-				Bukkit.broadcastMessage(ChatColor.GOLD + "The Thieves have won the game!");
-			}
 			event.setCancelled(true);
 			ItemStack artifact = Items.createArtifact();
 
@@ -532,8 +526,6 @@ public class Main extends JavaPlugin implements Listener {
 					} else {
 						Bukkit.broadcastMessage(ChatColor.GOLD + "Let the game begin!");
 
-
-
 						int thievesX = getConfig().getInt("Thieves.x");
 						int thievesY = getConfig().getInt("Thieves.y");
 						int thievesZ = getConfig().getInt("Thieves.z");
@@ -547,10 +539,11 @@ public class Main extends JavaPlugin implements Listener {
 							Player player = Bukkit.getServer().getPlayer(thieves);
 							player.sendMessage(ChatColor.GOLD + "Teleported to theives base");
 							player.teleport(new Location(player.getWorld(), thievesX, thievesY, thievesZ));
-							giveKits(player);
 							if(player.getInventory().contains(Material.NETHER_STAR)){
 								player.getInventory().remove(Material.NETHER_STAR);
 							}
+
+							giveKits(player);
 						}
 
 						// move all guards to their base
@@ -579,17 +572,17 @@ public class Main extends JavaPlugin implements Listener {
 
 	}
 
-	public void gameWin(String team) {
+	public void gameWin(Boolean thiefWin) {
 		for(Player p : Bukkit.getOnlinePlayers()){
 			p.getInventory().clear();
-			if (team == "THIEF") {
-				if (Teams.isInTeam(p)) {
+			Bukkit.broadcastMessage("GAME WON");
+			if (thiefWin == true && Teams.isInTeam(p) == true) {
 					if (Teams.isThief(p)) {
 						sqlf.addWin(p);
+						p.sendMessage("TESTING");
 					} else {
 						sqlf.addLost(p);
 					}
-				}
 			} else {
 				if (Teams.isInTeam(p)) {
 					if (!Teams.isThief(p)) {
@@ -599,8 +592,6 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 			}
-
-
 		}
 	}
 
@@ -755,12 +746,17 @@ public class Main extends JavaPlugin implements Listener {
 					if(gameLength != 0) {
 						gameLength--;
 						countdownTimerScore.setScore(gameLength);
+						if (artifactsScore.getScore() >= 6) {
+							gameLength = -1; // set count down timer to -1 so the scheduler does not run any further.
+							countdownTimerScore.setScore(0);
+							Bukkit.broadcastMessage(ChatColor.GOLD + "The Thieves have won the game!");
+							gameWin(true);
+						}
 					} else {
+						gameLength = -1; // set count down timer to -1 so the scheduler does not run any further.
 						Bukkit.broadcastMessage(ChatColor.GOLD + "The Guards have won the game!");
-						gameWin("GUARDS");
-						gameLength--; // set count down timer to -1 so the scheduler does not run any further.
+						gameWin(false);
 						countdownTimerScore.setScore(0);
-
 					}
 				}
 			}
