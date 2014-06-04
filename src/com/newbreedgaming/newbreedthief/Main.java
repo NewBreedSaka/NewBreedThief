@@ -466,7 +466,7 @@ public class Main extends JavaPlugin implements Listener {
 		Block block = placedOn.getBlock();
 		if (block.getType() == Material.BEDROCK && event.getBlockPlaced().getType() == Material.DRAGON_EGG) {
 			artifactsScore.setScore(artifactsScore.getScore() + 1);
-			if (artifactsScore.getScore() == getConfig().getInt("ArtifactsToWin")) {
+			if ( (int)(artifactsScore.getScore()) == getConfig().getInt("ArtifactsToWin")) {
 				//cancel game scheduler
 				//end game
 				gameWin("THIEF");
