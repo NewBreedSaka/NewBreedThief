@@ -55,13 +55,15 @@ import de.slikey.effectlib.effect.HelixLocationEffect;
 
 public class Main extends JavaPlugin implements Listener {
 	private EffectManager effectManager;
-	public int countdowntimer = 30;
+	public int countdownTimer = 30;
+	public int gameLength = 1200;
 	public boolean gameBegun = false;
 	public Scoreboard board;
 	public Objective obj;
 	public Team thiefTeam;
 	public Team guardTeam;
 	public Score artifactsScore;
+	public Score countdownTimerScore;
 	
 	//Initialise Classes
 	SQLFunctions sqlf;
@@ -112,6 +114,9 @@ public class Main extends JavaPlugin implements Listener {
 
 		artifactsScore = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE + "Artifacts:"));
 		artifactsScore.setScore(0);
+		
+		countdownTimerScore = obj.getScore(Bukkit.getOfflinePlayer(ChatColor.WHITE + "Time left:"));
+		countdownTimerScore.setScore(0);
 
 		thiefTeam.setCanSeeFriendlyInvisibles(true);
 		thiefTeam.setAllowFriendlyFire(false);
@@ -514,16 +519,16 @@ public class Main extends JavaPlugin implements Listener {
 	public void startGame() {
 		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 			public void run() {
-				if(countdowntimer != -1) {
-					if(countdowntimer != 0) {
-						if (countdowntimer == 30) {
-							Bukkit.broadcastMessage(ChatColor.GOLD + "Game starting in " + countdowntimer + " seconds");
-						} else if (countdowntimer == 15) {
-							Bukkit.broadcastMessage(ChatColor.GOLD + "Game starting in " + countdowntimer + " seconds");
-						} else if (countdowntimer <= 5) {
-							Bukkit.broadcastMessage(ChatColor.GOLD + "Game starting in " + countdowntimer + " seconds");
+				if(countdownTimer != -1) {
+					if(countdownTimer != 0) {
+						if (countdownTimer == 30) {
+							Bukkit.broadcastMessage(ChatColor.GOLD + "Game starting in " + countdownTimer + " seconds");
+						} else if (countdownTimer == 15) {
+							Bukkit.broadcastMessage(ChatColor.GOLD + "Game starting in " + countdownTimer + " seconds");
+						} else if (countdownTimer <= 5) {
+							Bukkit.broadcastMessage(ChatColor.GOLD + "Game starting in " + countdownTimer + " seconds");
 						}
-						countdowntimer--;
+						countdownTimer--;
 					} else {
 						Bukkit.broadcastMessage(ChatColor.GOLD + "Let the game begin!");
 
@@ -552,7 +557,6 @@ public class Main extends JavaPlugin implements Listener {
 						for(String guards : Teams.getGuards()) {
 							Player player = Bukkit.getServer().getPlayer(guards);
 							Bukkit.getServer().getPlayer(guards).sendMessage(ChatColor.GOLD + "Teleported to guards base");
-							giveKits(player);
 
 							player.teleport(new Location(player.getWorld(), guardsX, guardsY, guardsZ));
 
@@ -560,9 +564,13 @@ public class Main extends JavaPlugin implements Listener {
 								player.getInventory().remove(Material.NETHER_STAR);
 							}
 
+							giveKits(player);
+
 						}
 						gameBegun = true;
-						countdowntimer--; // set count down timer to -1 so the scheduler does not run any further.
+						runTimer();
+						countdownTimer--; // set count down timer to -1 so the scheduler does not run any further.
+						
 					}
 				}
 			}
@@ -649,7 +657,7 @@ public class Main extends JavaPlugin implements Listener {
 					selectedKit.put(p.getName(), "Smoke");
 					p.closeInventory();
 					return;
-				} else if (itemName.contains("Thief")) {
+				} else if (itemName.contains("Default Thief")) {
 					e.setCancelled(true);
 					p.sendMessage(ChatColor.GREEN + "You selected the Standard Thief kit!");
 					selectedKit.put(p.getName(), "Default");
@@ -737,6 +745,27 @@ public class Main extends JavaPlugin implements Listener {
 			return Math.floor(Math.log(value) / Math.log(base));
 		}
 
+	}
+	
+	public void runTimer(){
+		
+		this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+			public void run() {
+				if(gameLength != -1) {
+					if(gameLength != 0) {
+						gameLength--;
+						countdownTimerScore.setScore(gameLength);
+					} else {
+						Bukkit.broadcastMessage(ChatColor.GOLD + "The Guards have won the game!");
+						gameWin("GUARDS");
+						gameLength--; // set count down timer to -1 so the scheduler does not run any further.
+						countdownTimerScore.setScore(0);
+
+					}
+				}
+			}
+
+		}, 0L, 20L);
 	}
 
 
