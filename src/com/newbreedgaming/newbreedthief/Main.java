@@ -91,6 +91,7 @@ public class Main extends JavaPlugin implements Listener {
 
 	public void onEnable() {
 		getConfig().options().copyDefaults(true);
+		sqlf = new SQLFunctions(this);
 
 		kitSelector = new ItemStack(Material.NETHER_STAR);
 		ItemMeta im = kitSelector.getItemMeta();
